@@ -1,7 +1,7 @@
 ; LKD70s ARK: All in one
-; This project and all files associated with it are licensed under the MIT License.
+; This project and all files associated with it are licensed under the AGPL License.
 ; A copy of this license can be found in the parent directory of the project or at
-; the following link: https://github.com/lkd70/ark_All_In_One/blob/main/LICENSE
+; the following link: https://github.com/lkd70/LKD_ARK_AIO/blob/master/LICENSE
 
 #MaxThreadsPerHotkey 2
 ;CoordMode("ToolTip", "Screen")
