@@ -18,6 +18,23 @@ global toggle := 0
 global F_Mode := 1
 global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops"]
 
+
+; Check release version, see if there's a newer one available
+this_version := FileRead("version.txt")
+whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+whr.Open("GET", "https://raw.githubusercontent.com/lkd70/LKD_ARK_AIO/master/version.txt")
+whr.Send()
+whr.WaitForResponse()
+version_available := whr.ResponseText
+if (version_available != this_version) {
+    Result := MsgBox("A newer version of this script is avaiable for download. Would you like to download it?",, "YesNo")
+    if (Result = "Yes") {
+        Run("https://github.com/lkd70/LKD_ARK_AIO/releases/latest/download/ARK_All_In_One.exe")
+        ExitApp(1)
+    }
+}
+
+
 runMacro("Init",, 10)
 
 For f in [ 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12 ] {
@@ -135,7 +152,20 @@ F8_Macro() {
 }
 
 F10_Macro() {
-    
+    toggle := !toggle
+    ToolTip("Healing", 0, 0)
+    Sleep(500)
+    loop {
+        if (!toggle) {
+            Click("Up right")
+            ToolTip()
+            break
+        }
+        Click("Down right")
+        Sleep(20000)
+        Click("Up right")
+        Sleep(14000)
+    }
 }
 
 Magic_1_Macro() {
