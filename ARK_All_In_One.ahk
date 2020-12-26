@@ -34,7 +34,6 @@ if (version_available > version) {
     }
 }
 
-
 runMacro("Init",, 10)
 
 For f in [ 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12 ] {
@@ -49,11 +48,11 @@ $F9:: Reload()
 
 Init_Macro() {
     ToolTip("Setting gamma to default...", 0, 0)
-    Sleep(1000)
+    Rest(1000)
     send("{tab}")
-    Sleep(100)
+    Rest(100)
     send("gamma")
-    Sleep(100)
+    Rest(100)
     send("{enter}")
     ToolTip()
 }
@@ -81,7 +80,7 @@ F4_Macro() {
 	Click("Down Right")
 	Send("{E Down}")
 	Send("{E Up}")
-	Sleep(50)
+	Rest(50)
 	Click("Up Right")
 }
 
@@ -91,7 +90,7 @@ F5_Macro() {
         If (!toggle)
             break
         Click()
-        Sleep(50)
+        Rest(50)
     }
 }
 
@@ -102,22 +101,22 @@ F6_Macro() {
             break
         transferFromInventory()
         MouseMove(implant.x + 500, implant.y, 1)
-        Sleep(200)
+        Rest(200)
         Send("o")
-        Sleep(200)
+        Rest(200)
         MouseMove(implant.x + 400, implant.y, 1)
-        Sleep(200)
+        Rest(200)
         Send("o")
         MouseMove(implant.x + 300, implant.y, 1)
-        Sleep(200)
+        Rest(200)
         Send("o")
         MouseMove(implant.x + 200, implant.y, 1)
-        Sleep(200)
+        Rest(200)
         Send("o")
         MouseMove(implant.x + 100, implant.y, 1)
-        Sleep(200)
+        Rest(200)
         Send("o")
-        Sleep(100)
+        Rest(100)
     }
 }
 
@@ -126,7 +125,7 @@ F7_Macro() {
     if (F_Mode > F_Modes.Length) {
         F_Mode := 1
         ToolTip("Mode: Off", 0, 0)
-        Sleep(1000)
+        Rest(1000)
         ToolTip()
     } else {
         ToolTip("Mode: " . F_Modes[F_Mode], 0, 0)
@@ -142,19 +141,19 @@ F8_Macro() {
                 break
             Counter := Counter + 1
             Send("F")
-            Sleep(500)
+            Rest(500)
             Send("F")
             ToolTip("Slots gained: " . Counter, 0,0)
-            Sleep(500)
+            Rest(500)
         }
-    Sleep(5000)
+    Rest(5000)
     ToolTip()
 }
 
 F10_Macro() {
     toggle := !toggle
     ToolTip("Healing", 0, 0)
-    Sleep(500)
+    Rest(500)
     loop {
         if (!toggle) {
             Click("Up right")
@@ -162,9 +161,9 @@ F10_Macro() {
             break
         }
         Click("Down right")
-        Sleep(20000)
+        Rest(20000)
         Click("Up right")
-        Sleep(14000)
+        Rest(14000)
     }
 }
 
@@ -204,7 +203,7 @@ Magic_Macro() {
     funcName := "Magic_" . (F_Mode - 1) . "_Macro"
     run := Func(funcName)
     if (IsObject(run)) {
-        Sleep(100)
+        Rest(100)
         %run%()
         ToolTip("Mode: " . F_Modes[F_Mode] , 0, 0)
     }
@@ -248,9 +247,9 @@ transferFromInventory(items := "", delay := 500, isLocalInventory := false) {
         }
         MouseMove(isLocalInventory ? LocalSearch.x : RemoteSearch.y, isLocalInventory ? LocalSearch.y : RemoteSearch.y, 1)
         Click()
-        Sleep(50)
+        Rest(50)
         Send(items)
-        Sleep(50)
+        Rest(50)
     }
     MouseMove(isLocalInventory ? LocalTransferAll.x : RemoteTransferAll.x, isLocalInventory ? LocalTransferAll.y : RemoteTransferAll.y, 1)
     click()
@@ -267,13 +266,13 @@ dropFromRemote(items := "", delay := 500) {
         }
         MouseMove(RemoteSearch.x, RemoteSearch.y, 1)
         Click()
-        Sleep(50)
+        Rest(50)
         Send(items)
-        Sleep(50)
+        Rest(50)
     }
     MouseMove(RemoteDrop.x, RemoteDrop.y, 1)
     Click()
-    Sleep(delay)
+    Rest(delay)
 }
 
 WaitColour(x, y, colour, maxTries := 1000, variation := 10) {
@@ -281,7 +280,7 @@ WaitColour(x, y, colour, maxTries := 1000, variation := 10) {
         if (PixelSearch(a, b, x, y, x, y, colour, variation)) {
             return True
         } else {
-            Sleep(50)
+            Rest(50)
         }
     }
     return False
@@ -291,4 +290,9 @@ ScaleCoords(x, y) {
     outx := (x / 1920) * A_ScreenWidth
     outy := (y / 1080) * A_ScreenHeight
     return {x: Floor(outx), y: Floor(outy)}
+}
+
+Rest(delay) {
+    factor := 2
+    Sleep(delay * factor)
 }
