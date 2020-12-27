@@ -1,12 +1,13 @@
 ; LKD70s ARK: All in one
-; This project and all files associated with it are licensed under the AGPL License.
+; This project and all files associated with it are licensed under the AGPL-3.0 License.
 ; A copy of this license can be found in the parent directory of the project or at
 ; the following link: https://github.com/lkd70/LKD_ARK_AIO/blob/master/LICENSE
 
 #MaxThreadsPerHotkey 2
-;CoordMode("ToolTip", "Screen")
+CoordMode "ToolTip", "Screen" 
 
-global version := 1.1
+global ProjectName := "LKD ARK AIO"
+global version := 1.2
 global invColour := "0x008AA9"
 global RemoteSearch := ScaleCoords(1300, 180)
 global RemoteDrop := ScaleCoords(1530, 190)
@@ -21,11 +22,13 @@ global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops"]
 
 
 ; Check release version, see if there's a newer one available
+print("Checking version...")
 whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 whr.Open("GET", "https://raw.githubusercontent.com/lkd70/LKD_ARK_AIO/master/version.txt")
 whr.Send()
 whr.WaitForResponse()
 version_available := Float(whr.ResponseText)
+print("Current version: " . version . " Version available: " . version)
 if (version_available > version) {
     Result := MsgBox("A newer version of this script is avaiable for download. Would you like to download it?",, "YesNo")
     if (Result = "Yes") {
@@ -47,14 +50,14 @@ RShift:: Send("{Shift " . ( GetKeyState("Shift") ? "Up}" : "Down}"))
 $F9:: Reload()
 
 Init_Macro() {
-    ToolTip("Setting gamma to default...", 0, 0)
+    print("Setting gamma to default...")
     Rest(1000)
     send("{tab}")
     Rest(100)
     send("gamma")
     Rest(100)
     send("{enter}")
-    ToolTip()
+    print()
 }
 
 F1_Macro() {
@@ -124,11 +127,11 @@ F7_Macro() {
     F_Mode := F_Mode + 1
     if (F_Mode > F_Modes.Length) {
         F_Mode := 1
-        ToolTip("Mode: Off", 0, 0)
+        print("Mode: Off")
         Rest(1000)
-        ToolTip()
+        print()
     } else {
-        ToolTip("Mode: " . F_Modes[F_Mode], 0, 0)
+        print("Mode: " . F_Modes[F_Mode])
     }
 
 }
@@ -143,21 +146,21 @@ F8_Macro() {
             Send("F")
             Rest(500)
             Send("F")
-            ToolTip("Slots gained: " . Counter, 0,0)
+            print("Slots gained: " . Counter)
             Rest(500)
         }
     Rest(5000)
-    ToolTip()
+    print()
 }
 
 F10_Macro() {
     toggle := !toggle
-    ToolTip("Healing", 0, 0)
+    print("Healing")
     Rest(500)
     loop {
         if (!toggle) {
             Click("Up right")
-            ToolTip()
+            print()
             break
         }
         Click("Down right")
@@ -168,7 +171,7 @@ F10_Macro() {
 }
 
 Magic_1_Macro() {
-    ToolTip("Feeding meat...", 0, 0)
+    print("Feeding meat...")
     WaitColour(InvPixel.x, InvPixel.y, invColour)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
@@ -179,7 +182,7 @@ Magic_1_Macro() {
 }
 
 Magic_2_Macro() {
-    ToolTip("Feeding berries...", 0, 0)
+    print("Feeding berries...")
     WaitColour(InvPixel.x, InvPixel.y, invColour)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
@@ -189,7 +192,7 @@ Magic_2_Macro() {
 }
 
 Magic_3_Macro() {
-    ToolTip("Gathering Crops...", 0, 0)
+    print("Gathering Crops...")
     WaitColour(InvPixel.x, InvPixel.y, invColour)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
@@ -205,7 +208,7 @@ Magic_Macro() {
     if (IsObject(run)) {
         Rest(100)
         %run%()
-        ToolTip("Mode: " . F_Modes[F_Mode] , 0, 0)
+        print("Mode: " . F_Modes[F_Mode])
     }
 }
 
@@ -214,6 +217,7 @@ runMacro(callback, exec := "ahk_exe ShooterGame.exe", waitTimeout := 0, exitOnTi
     if (InStr(exec, "$F")) {
         exec := "ahk_exe ShooterGame.exe"
     }
+    print("Waiting " . waitTimeout . " second(s) for " . ((waitTimeout = 0) ? "WinActive" : "WinWaitActive"))
     if(method.Call(exec)) {
         run := Func(callback . "_Macro")
         if (run) 
@@ -223,9 +227,10 @@ runMacro(callback, exec := "ahk_exe ShooterGame.exe", waitTimeout := 0, exitOnTi
             Send("{" . callback . "}")
         } Else if (exitOnTimeout) {
             MsgBox("Attempted to wait " . waitTimeout . " seconds - '" . exec . "'' not started, exiting", "not loaded")
-            Exit(1)
+            ExitApp(1)
         }
     }
+    print()
 }
 
 openInventory(localInventory := false, maxTries := 1000) {
@@ -242,16 +247,20 @@ transferFromInventory(items := "", delay := 500, isLocalInventory := false) {
         if (IsObject(items)) {
             for item in items {
                 transferFromInventory(item, delay, isLocalInventory)
+                Rest(50)
             }
             Return
+        } else {
+            MouseMove(isLocalInventory ? LocalSearch.x : RemoteSearch.x, isLocalInventory ? LocalSearch.y : RemoteSearch.y, 1)
+            Rest(50)
+            Click()
+            Rest(50)
+            Send(items)
+            Rest(50)
         }
-        MouseMove(isLocalInventory ? LocalSearch.x : RemoteSearch.y, isLocalInventory ? LocalSearch.y : RemoteSearch.y, 1)
-        Click()
-        Rest(50)
-        Send(items)
-        Rest(50)
     }
     MouseMove(isLocalInventory ? LocalTransferAll.x : RemoteTransferAll.x, isLocalInventory ? LocalTransferAll.y : RemoteTransferAll.y, 1)
+    Rest(50)
     click()
     sleep(delay)
 }
@@ -266,9 +275,9 @@ dropFromRemote(items := "", delay := 500) {
         }
         MouseMove(RemoteSearch.x, RemoteSearch.y, 1)
         Click()
-        Rest(50)
+        Rest(100)
         Send(items)
-        Rest(50)
+        Rest(100)
     }
     MouseMove(RemoteDrop.x, RemoteDrop.y, 1)
     Click()
@@ -295,4 +304,30 @@ ScaleCoords(x, y) {
 Rest(delay) {
     factor := 2
     Sleep(delay * factor)
+}
+
+print(msg := "", prefix := true) {
+    out := (prefix = true) ? "[" . ProjectName . "] - " . msg : msg
+    if (msg != "") {
+        ToolTip(out, 0, 0)
+    } else {
+        ToolTip()
+    }
+}
+
+DrawCircle(x, y, colour := "FF0066", transparency := 100) {
+    MyGui := Gui.New()
+    MyGui.Opt("-Caption +AlwaysOnTop +Owner")
+    MyGui.BackColor := colour
+    WinSetTransparent(transparency, MyGui.Hwnd)
+    WinSetRegion("0-0 W40 H40 E", MyGui.Hwnd)
+	x:=x-20
+	y:=y-20
+    MyGui.Show("w500 h500 X" . x . " Y" . y)
+    return MyGui.Hwnd
+}
+
+RemoveCircle(Hwnd) {
+    MyGui := GuiFromHwnd(Hwnd)
+    MyGui.Destroy()
 }
