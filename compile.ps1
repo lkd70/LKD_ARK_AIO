@@ -1,4 +1,4 @@
-a$Compiler = ".\Compiler\Ahk2Exe.exe"
+$Compiler = ".\Compiler\Ahk2Exe.exe"
 $BinFIle = ".\Compiler\Unicode 64-bit.bin"
 $inFile = ".\ARK_All_In_One.ahk"
 $outFile = ".\ARK_All_In_One.exe"
