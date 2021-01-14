@@ -7,7 +7,7 @@
 CoordMode "ToolTip", "Screen" 
 
 global ProjectName := "LKD ARK AIO"
-global version := 1.2
+global version := 1.3
 global invColour := "0x008AA9"
 global RemoteSearch := ScaleCoords(1300, 180)
 global RemoteDrop := ScaleCoords(1530, 190)
@@ -18,7 +18,7 @@ global InvPixel := ScaleCoords(1815, 33)
 global implant := ScaleCoords(160, 280)
 global toggle := 0
 global F_Mode := 1
-global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops"]
+global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops", "Pickup All"]
 
 
 ; Check release version, see if there's a newer one available
@@ -45,7 +45,10 @@ For f in [ 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12 ] {
 }
 
 RCtrl:: Send("{w " . ( GetKeyState("w") ? "Up}" : "Down}"))
-RShift:: Send("{Shift " . ( GetKeyState("Shift") ? "Up}" : "Down}"))
+~W & RShift:: {
+	Send("{w " . ( GetKeyState("w") ? "Up}" : "Down}"))
+	Send("{Shift " . ( GetKeyState("Shift") ? "Up}" : "Down}"))
+}
 ~F:: runMacro("Magic")
 $F9:: Reload()
 
@@ -99,41 +102,35 @@ F5_Macro() {
 
 F6_Macro() {
     toggle := !toggle
+    dropped := 0
     loop 60 {
-        if (!toggle)
+        if (!toggle) {
+            print()
             break
+        }
         transferFromInventory()
-        MouseMove(implant.x + 500, implant.y, 1)
-        Rest(200)
-        Send("o")
-        Rest(200)
-        MouseMove(implant.x + 400, implant.y, 1)
-        Rest(200)
-        Send("o")
-        MouseMove(implant.x + 300, implant.y, 1)
-        Rest(200)
-        Send("o")
-        MouseMove(implant.x + 200, implant.y, 1)
-        Rest(200)
-        Send("o")
-        MouseMove(implant.x + 100, implant.y, 1)
-        Rest(200)
-        Send("o")
-        Rest(100)
+        loop 5 {
+            dropped := dropped + 1
+            Rest(10)
+            MouseMove(implant.x + ( A_Index * 100), implant.y, 1)
+            Rest(100)
+            Send("o")
+            print("Dropped stacks: " dropped)
+        }
     }
+    print()
 }
 
 F7_Macro() {
     F_Mode := F_Mode + 1
     if (F_Mode > F_Modes.Length) {
         F_Mode := 1
-        print("Mode: Off")
-        Rest(1000)
+        print("Mode: Off (F Modes:" F_Modes.Length ")")
+        Rest(2000)
         print()
     } else {
         print("Mode: " . F_Modes[F_Mode])
     }
-
 }
 
 F8_Macro() {
@@ -171,18 +168,16 @@ F10_Macro() {
 }
 
 Magic_1_Macro() {
-    print("Feeding meat...")
     WaitColour(InvPixel.x, InvPixel.y, invColour)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
-        transferFromInventory("oil")
+        transferFromInventory("spoiled")
         transferFromInventory("raw", ,true)
         Send("{Esc}")
     }
 }
 
 Magic_2_Macro() {
-    print("Feeding berries...")
     WaitColour(InvPixel.x, InvPixel.y, invColour)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
@@ -192,7 +187,6 @@ Magic_2_Macro() {
 }
 
 Magic_3_Macro() {
-    print("Gathering Crops...")
     WaitColour(InvPixel.x, InvPixel.y, invColour)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
@@ -202,13 +196,22 @@ Magic_3_Macro() {
     }
 }
 
+Magic_4_Macro() {
+    WaitColour(InvPixel.x, InvPixel.y, invColour)
+    Colour := PixelGetColor(InvPixel.x, InvPixel.y)
+    if (Colour = invColour) {
+        transferFromInventory()
+    }
+}
+
 Magic_Macro() {
     funcName := "Magic_" . (F_Mode - 1) . "_Macro"
     run := Func(funcName)
     if (IsObject(run)) {
         Rest(100)
         %run%()
-        print("Mode: " . F_Modes[F_Mode])
+    } else if (F_Modes[F_Mode] != "Off") {
+    	print("Unknown mode: " . F_Modes[F_Mode])
     }
 }
 
@@ -217,7 +220,6 @@ runMacro(callback, exec := "ahk_exe ShooterGame.exe", waitTimeout := 0, exitOnTi
     if (InStr(exec, "$F")) {
         exec := "ahk_exe ShooterGame.exe"
     }
-    print("Waiting " . waitTimeout . " second(s) for " . ((waitTimeout = 0) ? "WinActive" : "WinWaitActive"))
     if(method.Call(exec)) {
         run := Func(callback . "_Macro")
         if (run) 
@@ -230,7 +232,6 @@ runMacro(callback, exec := "ahk_exe ShooterGame.exe", waitTimeout := 0, exitOnTi
             ExitApp(1)
         }
     }
-    print()
 }
 
 openInventory(localInventory := false, maxTries := 1000) {
@@ -252,7 +253,7 @@ transferFromInventory(items := "", delay := 500, isLocalInventory := false) {
             Return
         } else {
             MouseMove(isLocalInventory ? LocalSearch.x : RemoteSearch.x, isLocalInventory ? LocalSearch.y : RemoteSearch.y, 1)
-            Rest(50)
+            Rest(20)
             Click()
             Rest(50)
             Send(items)
