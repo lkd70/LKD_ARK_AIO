@@ -4,10 +4,11 @@
 ; the following link: https://github.com/lkd70/LKD_ARK_AIO/blob/master/LICENSE
 
 #MaxThreadsPerHotkey 2
-CoordMode "ToolTip", "Screen" 
+CoordMode "ToolTip", "Screen"
+
 
 global ProjectName := "LKD ARK AIO"
-global version := 1.3
+global version := 1.4
 global invColour := "0x008AA9"
 global RemoteSearch := ScaleCoords(1300, 180)
 global RemoteDrop := ScaleCoords(1530, 190)
@@ -19,7 +20,6 @@ global implant := ScaleCoords(160, 280)
 global toggle := 0
 global F_Mode := 1
 global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops", "Pickup All"]
-
 
 ; Check release version, see if there's a newer one available
 print("Checking version...")
@@ -54,11 +54,11 @@ $F9:: Reload()
 
 Init_Macro() {
     print("Setting gamma to default...")
-    Rest(1000)
+    Rest(100)
     send("{tab}")
-    Rest(100)
+    Rest(50)
     send("gamma")
-    Rest(100)
+    Rest(50)
     send("{enter}")
     print()
 }
@@ -168,7 +168,7 @@ F10_Macro() {
 }
 
 Magic_1_Macro() {
-    WaitColour(InvPixel.x, InvPixel.y, invColour)
+    openInventory(false, 10, 10)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
         transferFromInventory("spoiled")
@@ -178,7 +178,7 @@ Magic_1_Macro() {
 }
 
 Magic_2_Macro() {
-    WaitColour(InvPixel.x, InvPixel.y, invColour)
+    openInventory(false, 10, 10)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
         transferFromInventory("berry", ,true)
@@ -187,7 +187,7 @@ Magic_2_Macro() {
 }
 
 Magic_3_Macro() {
-    WaitColour(InvPixel.x, InvPixel.y, invColour)
+    openInventory(false, 10, 10)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
         transferFromInventory()
@@ -197,10 +197,10 @@ Magic_3_Macro() {
 }
 
 Magic_4_Macro() {
-    WaitColour(InvPixel.x, InvPixel.y, invColour)
+    openInventory(false, 10, 10)
     Colour := PixelGetColor(InvPixel.x, InvPixel.y)
     if (Colour = invColour) {
-        transferFromInventory()
+        transferFromInventory("", 10)
     }
 }
 
@@ -234,21 +234,20 @@ runMacro(callback, exec := "ahk_exe ShooterGame.exe", waitTimeout := 0, exitOnTi
     }
 }
 
-openInventory(localInventory := false, maxTries := 1000) {
-    res := WaitColour(InvPixel.x, InvPixel.y, invColour, 1)
-    if (res == true)
+openInventory(localInventory := false, maxTries := 1000, precheckTries := 1) {
+    res := WaitColour(InvPixel.x, InvPixel.y, invColour, precheckTries)
+    if (res == true) {
         return true
+    }
     Send(localInventory ? "i" : "f")
-    res := WaitColour(InvPixel.x, InvPixel.y, invColour, maxTries)
-    return res
+    return WaitColour(InvPixel.x, InvPixel.y, invColour, maxTries)
 }
 
-transferFromInventory(items := "", delay := 500, isLocalInventory := false) {
+transferFromInventory(items := "", delay := 100, isLocalInventory := false) {
     if (items) {
         if (IsObject(items)) {
             for item in items {
                 transferFromInventory(item, delay, isLocalInventory)
-                Rest(50)
             }
             Return
         } else {
@@ -257,7 +256,6 @@ transferFromInventory(items := "", delay := 500, isLocalInventory := false) {
             Click()
             Rest(50)
             Send(items)
-            Rest(50)
         }
     }
     MouseMove(isLocalInventory ? LocalTransferAll.x : RemoteTransferAll.x, isLocalInventory ? LocalTransferAll.y : RemoteTransferAll.y, 1)
@@ -285,7 +283,7 @@ dropFromRemote(items := "", delay := 500) {
     Rest(delay)
 }
 
-WaitColour(x, y, colour, maxTries := 1000, variation := 10) {
+WaitColour(x, y, colour, maxTries := 100, variation := 10) {
     loop maxTries {
         if (PixelSearch(a, b, x, y, x, y, colour, variation)) {
             return True
