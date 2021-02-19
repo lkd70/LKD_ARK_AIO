@@ -8,11 +8,11 @@ CoordMode "ToolTip", "Screen"
 
 
 global ProjectName := "LKD ARK AIO"
-global version := 1.4
+global version := 1.5
 global invColour := "0x008AA9"
 global RemoteSearch := ScaleCoords(1300, 180)
-global RemoteDrop := ScaleCoords(1530, 190)
-global RemoteTransferAll := ScaleCoords(1480, 190)
+global RemoteDrop := ScaleCoords(1480, 190)
+global RemoteTransferAll := ScaleCoords(1430, 190)
 global LocalSearch := ScaleCoords(175, 180)
 global LocalTransferAll := ScaleCoords(350, 190)
 global InvPixel := ScaleCoords(1815, 33)
