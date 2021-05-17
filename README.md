@@ -56,10 +56,12 @@ the game. The F modes are listed below
 
 #### Available F Modes:
 
-1. Off - No function
-2. Meat Feed - Access the dino you're looking at, remove spoiled/oil, feed raw. 
-3. Berry Feed - Access the dino you're looking at, feed berries
-4. Crop Plots - Empty crop plots, fill again with fert
+0. Off - No function
+1. Meat Feed - Access the dino you're looking at, remove spoiled/oil, feed raw. 
+2. Berry Feed - Access the dino you're looking at, feed berries
+3. Crop Plots - Empty crop plots, fill again with fert
+4. Access inventory, take all (useful for quickly looting bags)
+5. transfer hide to local inventory from remote and drop all else. Good for frog mission
 
 ### F8 - SlotBot
 

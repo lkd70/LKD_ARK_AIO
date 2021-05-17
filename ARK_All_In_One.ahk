@@ -8,7 +8,7 @@ CoordMode "ToolTip", "Screen"
 
 
 global ProjectName := "LKD ARK AIO"
-global version := 1.5
+global version := 1.6
 global invColour := "0x008AA9"
 global RemoteSearch := ScaleCoords(1300, 180)
 global RemoteDrop := ScaleCoords(1480, 190)
@@ -19,7 +19,7 @@ global InvPixel := ScaleCoords(1815, 33)
 global implant := ScaleCoords(160, 280)
 global toggle := 0
 global F_Mode := 1
-global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops", "Pickup All"]
+global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops", "Pickup All", "Hide Farm"]
 
 ; Check release version, see if there's a newer one available
 print("Checking version...")
@@ -102,6 +102,7 @@ F5_Macro() {
 
 F6_Macro() {
     toggle := !toggle
+    startTime := A_TickCount
     dropped := 0
     loop 60 {
         if (!toggle) {
@@ -111,11 +112,15 @@ F6_Macro() {
         transferFromInventory()
         loop 5 {
             dropped := dropped + 1
+            Rest(5)
+            MouseMove((implant.x + 600) - (A_Index * 100), implant.y, 1)
+            Rest(150)
+            click()
             Rest(10)
-            MouseMove(implant.x + ( A_Index * 100), implant.y, 1)
-            Rest(100)
             Send("o")
-            print("Dropped stacks: " dropped)
+            Send("o")
+            expire := 120000 - (A_TickCount - startTime)
+            print("Dropped stacks: " dropped ". " (expire < 1 ? "Timer on first item expired!" : "Expires: " FormatMilliseconds(expire))) 
         }
     }
     print()
@@ -204,6 +209,17 @@ Magic_4_Macro() {
     }
 }
 
+Magic_5_Macro() {
+        openInventory(false, 10, 10)
+    Colour := PixelGetColor(InvPixel.x, InvPixel.y)
+    if (Colour = invColour) {
+        transferFromInventory("hide")
+        Rest(50)
+        dropFromRemote("", 50)
+        Send("f")
+    }
+}
+
 Magic_Macro() {
     funcName := "Magic_" . (F_Mode - 1) . "_Macro"
     run := Func(funcName)
@@ -234,6 +250,43 @@ runMacro(callback, exec := "ahk_exe ShooterGame.exe", waitTimeout := 0, exitOnTi
     }
 }
 
+FormatMilliseconds(ms) {
+    str := ""
+    d := Floor(ms / 86400000)
+    h := Floor(MOD(ms, 86400000) / 3600000)
+    m := Floor(MOD(ms, 3600000) / 60000)
+    s := Floor(MOD(ms, 60000) / 1000)
+
+    if (d > 0) {
+        str := str . d . " day" . (d > 1 ? "s" : "")
+    }
+
+    if (d > 0 && h > 0) {
+        str := (m + s = 0) ? str . " and " : str . ", "
+    }
+
+    if (h > 0) {
+        str := str . h . " hour" . (h > 1 ? "s" : "")
+    }
+
+    if (h > 0 && m > 0) {
+        str := (s = 0) ? str . " and " : str . ", "
+    }
+
+    if (m > 0) {
+        str := str . m . " minute" . (m > 1 ? "s" : "")
+    }
+
+    if (m > 0 && s > 0) {
+        str := (h > 0) ? str . ", and " : str . " and "
+    }
+
+    if (s > 0) {
+        str := str . s . " second" . (s > 1 ? "s" : "")
+    }
+    return str
+}
+
 openInventory(localInventory := false, maxTries := 1000, precheckTries := 1) {
     res := WaitColour(InvPixel.x, InvPixel.y, invColour, precheckTries)
     if (res == true) {
@@ -252,7 +305,7 @@ transferFromInventory(items := "", delay := 100, isLocalInventory := false) {
             Return
         } else {
             MouseMove(isLocalInventory ? LocalSearch.x : RemoteSearch.x, isLocalInventory ? LocalSearch.y : RemoteSearch.y, 1)
-            Rest(20)
+            Rest(30)
             Click()
             Rest(50)
             Send(items)
