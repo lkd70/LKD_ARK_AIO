@@ -5,3 +5,8 @@ $outFile = ".\ARK_All_In_One.exe"
 $iconFile = ".\icon.ico"
 
 & $compiler  /bin $BinFIle /in $inFile /out $outFile /icon $iconFile /compress 2
+
+$inFile = ".\updater.ahk"
+$outFile = ".\updater.exe"
+
+& $compiler  /bin $BinFIle /in $inFile /out $outFile /icon $iconFile /compress 2

@@ -1,5 +1,6 @@
 .vscode/
 tools/
+updater.exe
 ARK_All_In_One.exe
 Compiler/Unicode 32-bit.bin
 Compiler/AutoHotkeySC.bin

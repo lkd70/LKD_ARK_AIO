@@ -21,6 +21,11 @@ global toggle := 0
 global F_Mode := 1
 global F_Modes := ["Off", "Feed Meat", "Feed Berries", "Gather Crops", "Pickup All", "Hide Farm"]
 
+; For < 1.7 versions that do not have the updater executable
+if (!FileExist("updater.exe")) {
+    Download("https://github.com/lkd70/LKD_ARK_AIO/releases/download/1.7/updater.exe", "updater.exe")
+}
+
 ; Check release version, see if there's a newer one available
 print("Checking version...")
 whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -32,7 +37,7 @@ print("Current version: " . version . " Version available: " . version)
 if (version_available > version) {
     Result := MsgBox("A newer version of this script is avaiable for download. Would you like to download it?",, "YesNo")
     if (Result = "Yes") {
-        Run("https://github.com/lkd70/LKD_ARK_AIO/releases/latest/download/ARK_All_In_One.exe")
+        Run("updater.exe ARK_All_In_One https://github.com/lkd70/LKD_ARK_AIO/releases/latest/download/ARK_All_In_One.exe")
         ExitApp(1)
     }
 }
