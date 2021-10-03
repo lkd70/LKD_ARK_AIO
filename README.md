@@ -78,7 +78,7 @@ This mode is quite simple, activate this whilst sitting on an owl and it will fr
 
 ## Suggestions and coming soon™
 
-More is coming soon™. If you've any suggestions on what should be added, do feel free to contact me on Discord (LKD70\#7070) or open an issue here on github
+More is coming soon™. If you've any suggestions on what should be added, do feel free to contact me on Discord: LKD70\#7070 or better than that, open an issue here on github
 
 Please note that the feature set of this script is intended for everyday use. Anything that isn't used in regular active gameplay (such as bots to automate entire processes) isn't right for this script. This is purely to assist you in your gameplay, not to play the game for you
 
